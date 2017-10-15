@@ -1,0 +1,106 @@
+<html>
+
+<head>
+	<title>Event Repeater</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+</head>
+
+<body class="container-fluid">
+	<div class="row justify-content-center">
+		<div class="col-sm-12 col-md-6 col-lg-4">
+			<br>
+			<div class="card text-center" style="height:92.25%">
+				<div  class="card-body">
+					<h4 class="card-title" >Subscribe to channel</h4><br>
+					<form  id="subscribe">
+						<input id="channel" type="text" size=35 class="form-control" placeholder="Channel" /><br>
+						<button type="submit" class="row btn btn-primary">Subscribe</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-12 col-md-6 col-lg-4">
+			<br>
+			<div class="card text-center">
+				<div  class="card-body">
+					<h4 class="card-title" >Publish message</h4><br>
+					<form  id="publish">
+						<input id="destiny" type="text" size=35 class="form-control" placeholder="Channel" /><br>
+						<input id="message" type="text" size=35 class="form-control" placeholder="Message" /><br>
+						<button type="submit" class="row btn btn-primary">Publish</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="row justify-content-center">
+		<div class="col-sm-12 col-lg-8">
+			<br>
+			<div class="card text-center" >
+				<div  class="card-body">
+					<h4 class="card-title" >Messages</h4><br>
+					<ul id="messages" class="list-group list-group-flush">
+					</ul>
+					<br>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<br>
+	
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+	
+	<script src="//cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/vertx/3.4.2/vertx-eventbus.min.js"></script>
+
+	<script>
+		$(function() {
+			var eb = new EventBus("/eventbus/");
+			eb.onopen = function() {
+				console.log("Eventbus connected!")
+			};
+
+			$("#publish").submit(function(e) {
+				e.preventDefault();
+
+				var channel = $("#destiny").val();
+				var message = $("#message").val();
+				
+				if (message.length > 0) {
+					var publication = {
+						channel: channel,
+						payload: {
+							message: message
+						}
+					};
+					eb.send("publication-channel", publication);
+					$("#msg").val("");
+				}
+			});
+			
+			$("#subscribe").submit(function(e) {
+				e.preventDefault();
+
+				var channel = $("#channel").val();
+				eb.registerHandler(channel, function(err, msg) {
+					console.log(msg.body);
+					var message = msg.body.message;
+					var child = '<blockquote class="blockquote text-left">' + 
+					  '<p class="mb-0">' + message + '</p>' +
+					  '<footer class="blockquote-footer text-right">from ' + channel + '</footer>'+
+					'</blockquote>';
+					$("#messages").prepend( '<li class="list-group-item">' + child + '</li>');
+				});
+			});
+		});
+	</script>
+
+</body>
+
+</html>

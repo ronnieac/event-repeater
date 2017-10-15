@@ -1,0 +1,5 @@
+{
+	"rabbitMQ": {
+		"uri": "amqp://user:password@server/vhost"
+	}
+}

@@ -1,0 +1,21 @@
+Configuration:
+  name: Default
+
+  Appenders:
+    Console:
+      name: Console
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
+    File:
+      name: File
+      fileName: /tmp/event-repeater.log
+      PatternLayout:
+        pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
+        
+  Loggers: 
+    Root:
+        level: debug
+        AppenderRef:
+          - ref: File
+          - ref: Console
